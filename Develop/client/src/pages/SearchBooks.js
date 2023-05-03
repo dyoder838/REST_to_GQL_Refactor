@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 import { useMutation } from '@apollo/client';
@@ -64,7 +64,7 @@ const SearchBooks = () => {
   };
 
   // create function to handle saving a book to our database
-  const [savedBook] = useMutation(SAVE_BOOK); 
+  const [saveBook] = useMutation(SAVE_BOOK); 
 
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
@@ -78,13 +78,10 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await savedBook(bookToSave, token);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      // if book successfully saves to user's account, save book id to state
+      const { data } = await saveBook({
+        variables: { bookData: { ...bookToSave } },
+      });
+      console.log(savedBookIds);
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
       console.error(err);
